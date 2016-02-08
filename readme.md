@@ -60,7 +60,7 @@ Configuration
 - `component_id` is optional
 - `threshold` is a percentage
 - `expected_status_code` is a http response code
-- `proxy` is the url of a proxy http, it can be set for requesting on cachet or/and for each monitored url (this allow different proxy to be set)
+- `proxy` is the url of an http proxy, it can be set for requesting on cachet or/and for each monitored urls (this allow different proxy to be set)
 - GET request will be performed on the `url`
 
 How to run
