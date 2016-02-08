@@ -48,7 +48,7 @@ func (monitor *Monitor) doRequest() bool {
 	client := &http.Client{
 		Timeout: timeout,
 	}
-	transport := &http.Transport{}
+	transport := &http.Transport{Proxy: http.ProxyFromEnvironment}
 	if Config.InsecureAPI == true {
 		transport.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 	}

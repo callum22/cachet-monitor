@@ -15,7 +15,7 @@ func makeRequest(requestType string, url string, reqBody []byte) (*http.Response
 	req.Header.Set("X-Cachet-Token", Config.APIToken)
 
 	client := &http.Client{}
-	transport := &http.Transport{}
+	transport := &http.Transport{Proxy: http.ProxyFromEnvironment}
 	if Config.InsecureAPI == true {
 		transport.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 	}
