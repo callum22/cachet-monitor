@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+	"net/url"
 )
 
 const timeout = time.Duration(time.Second)
@@ -19,10 +20,11 @@ type Monitor struct {
 	ComponentID        *int    `json:"component_id"`
 	ExpectedStatusCode int     `json:"expected_status_code"`
 	StrictTLS          *bool   `json:"strict_tls"`
+	Proxy              string  `json:"proxy,omitempty"`
 
-	History        []bool    `json:"-"`
-	LastFailReason *string   `json:"-"`
-	Incident       *Incident `json:"-"`
+	History            []bool    `json:"-"`
+	LastFailReason     *string   `json:"-"`
+	Incident           *Incident `json:"-"`
 }
 
 // Run loop
@@ -32,7 +34,7 @@ func (monitor *Monitor) Run() {
 	lag := getMs() - reqStart
 
 	if len(monitor.History) >= 10 {
-		monitor.History = monitor.History[len(monitor.History)-9:]
+		monitor.History = monitor.History[len(monitor.History) - 9:]
 	}
 	monitor.History = append(monitor.History, isUp)
 	monitor.AnalyseData()
@@ -46,11 +48,20 @@ func (monitor *Monitor) doRequest() bool {
 	client := &http.Client{
 		Timeout: timeout,
 	}
-	if monitor.StrictTLS != nil && *monitor.StrictTLS == false {
-		client.Transport = &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-		}
+	transport := &http.Transport{}
+	if Config.InsecureAPI == true {
+		transport.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 	}
+	if monitor.Proxy != "" {
+		proxyUrl, err := url.Parse(monitor.Proxy)
+		if err != nil {
+			failReason := "Error with proxy: %v" + err.Error()
+			monitor.LastFailReason = &failReason
+			return false
+		}
+		transport.Proxy = http.ProxyURL(proxyUrl)
+	}
+	client.Transport = transport
 
 	resp, err := client.Get(monitor.URL)
 	if err != nil {
@@ -81,7 +92,7 @@ func (monitor *Monitor) AnalyseData() {
 	}
 
 	t := (float32(numDown) / float32(len(monitor.History))) * 100
-	Logger.Printf("%s %.2f%% Down at %v. Threshold: %.2f%%\n", monitor.URL, t, time.Now().UnixNano()/int64(time.Second), monitor.Threshold)
+	Logger.Printf("%s %.2f%% Down at %v. Threshold: %.2f%%\n", monitor.URL, t, time.Now().UnixNano() / int64(time.Second), monitor.Threshold)
 
 	if len(monitor.History) != 10 {
 		// not enough data

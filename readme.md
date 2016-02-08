@@ -9,7 +9,7 @@ Features
 --------
 
 - [x] Creates & Resolves Incidents
-- [x] Posts monitor lag every second
+- [x] Posts monitor lag every second * config.Interval
 - [x] Updates Component to Partial Outage
 - [x] Updates Component to Major Outage if in Partial Outage
 - [x] Can be run on multiple servers and geo regions
@@ -34,6 +34,7 @@ Configuration
 {
   "api_url": "https://demo.cachethq.io/api/v1",
   "api_token": "9yMHsdioQosnyVK4iCVR",
+  "interval": 60,
   "monitors": [
     {
       "name": "nodegear frontend",
@@ -42,10 +43,12 @@ Configuration
       "component_id": 0,
       "threshold": 80,
       "expected_status_code": 200,
-      "strict_tls": true
+      "strict_tls": true,
+      "proxy": null
     }
   ],
-  "insecure_api": false
+  "insecure_api": false,
+  "proxy": null
 }
 ```
 
@@ -57,6 +60,7 @@ Configuration
 - `component_id` is optional
 - `threshold` is a percentage
 - `expected_status_code` is a http response code
+- `proxy` is the url of a proxy http, it can be set for requesting on cachet or/and for each monitored url (this allow different proxy to be set)
 - GET request will be performed on the `url`
 
 How to run

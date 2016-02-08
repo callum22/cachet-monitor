@@ -22,10 +22,12 @@ var Config CachetConfig
 type CachetConfig struct {
 	APIUrl      string     `json:"api_url"`
 	APIToken    string     `json:"api_token"`
+	Interval    int64      `json:"interval"`
 	Monitors    []*Monitor `json:"monitors"`
 	SystemName  string     `json:"system_name"`
 	LogPath     string     `json:"log_path"`
 	InsecureAPI bool       `json:"insecure_api"`
+	Proxy       string     `json:"proxy,omitempty"`
 }
 
 func LoadCachetConfigClassic() {

@@ -9,7 +9,7 @@ func main() {
 	cachet.LoadCachetConfigClassic()
 	log := cachet.Logger
 
-	log.Printf("System: %s, API: %s\n", cachet.Config.SystemName, cachet.Config.APIUrl)
+	log.Printf("System: %s, Interval: %d second(s), API: %s\n", cachet.Config.SystemName, cachet.Config.Interval, cachet.Config.APIUrl)
 	log.Printf("Starting %d monitors:\n", len(cachet.Config.Monitors))
 	for _, mon := range cachet.Config.Monitors {
 		log.Printf(" %s: GET %s & Expect HTTP %d\n", mon.Name, mon.URL, mon.ExpectedStatusCode)
@@ -20,7 +20,7 @@ func main() {
 
 	log.Println()
 
-	ticker := time.NewTicker(time.Second)
+	ticker := time.NewTicker(time.Duration(cachet.Config.Interval) * time.Second)
 	for range ticker.C {
 		for _, mon := range cachet.Config.Monitors {
 			go mon.Run()
