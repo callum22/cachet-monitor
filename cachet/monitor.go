@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"time"
 	"net/url"
+	"fmt"
 )
 
 const timeout = time.Duration(time.Second)
@@ -55,7 +56,7 @@ func (monitor *Monitor) doRequest() bool {
 	if monitor.Proxy != "" {
 		proxyUrl, err := url.Parse(monitor.Proxy)
 		if err != nil {
-			failReason := "Error with proxy: %v" + err.Error()
+			failReason := fmt.Sprintf("Error with proxy: %v", err.Error())
 			monitor.LastFailReason = &failReason
 			return false
 		}
